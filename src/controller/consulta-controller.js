@@ -1,63 +1,88 @@
-const ConsultaDAO = require('../DAO/consulta-DAO')
-const Consulta = require('../model/consulta-model')
+const ConsultasDAO = require('../DAO/consulta-DAO')
+const Consultas = require('../model/consulta-model')
+
+
 module.exports = (app,bd) =>{
-    const DaoCOnsulta = new ConsultaDAO(bd)
+    const consultasBanco = new ConsultasDAO(bd)
 
-    app.get('/consulta', async (req, res)=>{
+    app.get("/consultas", async (req, res)=>{
         try{
-            const mpostraConsulta = await DaoCOnsulta.MostrarConsulta()
-                res.status(200).json(mostrarConsulta)
-        }catch(e){
-            res.status(400).json(e)
-        }
-    })
+            const resposta = await consultasBanco.getAllConsultas();
+            res.json({ result: resposta });
+          } catch (error) {
+            res.status(500).json({ message: error.message });
+          }
+        });
 
-    app.get('/consulta/:ID', async (req,res)=>{
-        
-        try{
-            const id = req.params.ID;
-            const mostrarUmaConsulta = await DaoConsulta.MostrarUmaConsulta(id)
-            res.status(200).json(mostrarUmaConsulta)
-            }catch(e){
-                res.status().json(e)
+    app.get("/consultas/:id", async (req, res) => {
+        let { id } = req.params;
+        try {
+          if (parseInt(id)) {
+            let resposta = await consultasBanco.getAllConsulta(id);
+            if (resposta) res.json( resposta );
+            else {
+              throw new Error("Nenhuma consulta encontrada");
             }
-    })
-
-    app.post('/consulta', async (req,res)=>{
-        const { titulo,nome_dr,nome_paciente,descricao,status,data_Consulta,id_pacciente} = req.body;
-        const newConsulta = new Consulta (TITULO,NOME_DR,Nome_PACIENTE, DESCRICAO, STATUS, DATA_CONSULTA,ID_PACIENTE);
-
-        try{
-            const inserirConsulta = await DaoConsulta.NovaConsulta(newConsulta)
-            res.status(200).json(inserirConsulta)
-        }catch(e){
-            res.status(500).json(e)
+          } else {
+            throw new Error("é esperado um ID tipo INT, tente novamente");
+          }
+        } catch (err) {
+          res.status(500).json({ error: err.message });
         }
-    })
-
-    app.delete('/consulta/:', async (req,res)=>{
-        const teste = req.params
-        
-        try{
-           const deletarConsulta = await DaoConsulta.DeletarConsulta()
-           res.status(200).json(deletarConsulta)
-        }catch(e){
-            res.status(500).json(e)
+      });
+      
+      app.post("/consultas", async (req, res) => {
+        const { titulo,nome_dr,nome_paciente, descricao, status,data_consulta, id_Paciente} = req.body;
+        let newConsultas = new Consultas(titulo,nome_dr,nome_paciente, descricao, status,data_consulta,id_Paciente);
+        try {
+          await consultasBanco.insertConsultas(newConsultas);
+          res.status(201).json({
+            message: "Consultas inserida com sucesso",
+            error: false,
+          });
+        } catch (err) {
+          res.status(500).json({
+            message: "Erro ao inserir ",Consultas,
+            serverLog: err.message,
+            error: true,
+          });
         }
-    })
+      });
 
-    app.put('/consulta/:idPaciente', async (req,res)=>{
-        const teste = req.params.idPaciente
-        const body = req.body
-        const responda = [body.titulo,body.nome_dr,body.nome_paciente,body.descricao,body.status,body.data_Consulta,body.id_paciente]
+      app.delete("/consultas/:id", async (req, res) => {
+        const { id } = req.params;
+        try {
+          await consultasBanco.deleteConsultas(id);
+          res.status(200).json({
+            message: "Consultas deletada com sucesso",
+            error: false,
+          });
+        } catch (err) {
+          res.status(500).json({
+            message: "Erro ao deletar consultas",
+            serverLog: err.message,
+            error: true,
+          });
+        }
+      });
+
+      app.put("/consultas/:id", async (req, res) => {
+        const {titulo,nome_dr,nome_paciente, descricao, status,data_consulta,id_paciente} = req.body;
     
-
-        try{
-            const alterarConsulta = await DaoConsulta.AlterarConsulta(teste,responda)
-            res.status(200).json(alterarConsulta)
-        }catch(e){
-            res.status(500).json(e)
+        const { id } = req.params;
+    
+        try {
+          await consultasBanco.updateConsultas( titulo,nome_dr,nome_paciente, descricao, status,data_consulta,id_paciente);
+          res.status(200).json({
+            message: "consultas atualizada com sucesso",
+            error: false,
+          });
+        } catch (err) {
+          res.status(500).json({
+            message: "Erro ao atualizar a consultas",
+            serverLog: err.message,
+            error: true,
+          });
         }
-
-    })
-}
+      });
+    };

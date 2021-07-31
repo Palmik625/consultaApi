@@ -13,15 +13,16 @@ CREATE TABLE IF NOT EXISTS CONSULTAS (
     DESCRICAO VARCHAR(64),
     STATUS VARCHAR(64),
     DATA_CONSULTA VARCHAR(64),
+    ID_MEDICO INTEGER
     ID_PACIENTE INTEGER
   
 );`;
 
 const ADD_CONSULTAS_DATA = `INSERT INTO CONSULTAS (TITULO,NOME_DR,NOME_PACIENTE, DESCRICAO, STATUS, DATA_CONSULTA,ID_PACIENTE) VALUES
-('Consulta','Dr_Zangado','Lucas', 'Consulta agendada para seguda-feira', 'Manhã', '2021-07-20', 3),
-('Consulta','Dr_Amorin','Dayanne', 'Consulta agendada para terça-feira', 'Tarde', '2021-07-21', 5),
-('Consulta','Dr_Aracy','Vanessa', 'Consulta agendada para quarta-feira', 'Manhã', '2021-07-22', 7),
-('Consulta','Dra_Livia','Pedro' ,'Consulta agendada para quinta-feira', 'Tarde', '2021-07-23', 9)`
+('Consulta','Dr_Zangado','Lucas', 'Consulta agendada para seguda-feira', 'Manhã', '2021-07-20',2, 3),
+('Consulta','Dr_Amorin','Dayanne', 'Consulta agendada para terça-feira', 'Tarde', '2021-07-21',4, 5),
+('Consulta','Dr_Aracy','Vanessa', 'Consulta agendada para quarta-feira', 'Manhã', '2021-07-22',6, 7),
+('Consulta','Dra_Livia','Pedro' ,'Consulta agendada para quinta-feira', 'Tarde', '2021-07-23',8, 9)`
 
 function criaTabelaConsultas() {
     bd.run(CONSULTA_SCHEMA, (error)=> {
